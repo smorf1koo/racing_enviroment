@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "tbXh0ia6E3A=",
+  "success": true,
+  "projectFilePath": "/Users/glebpetrov/Diploma2025/_proto_gen/ProtoGen.csproj",
+  "expectedPackageFiles": [
+    "/var/folders/6v/bz1tcwc90dg8tr7lwr9dp7nr0000gn/T/cursor-sandbox-cache/148985196e6e520544dd5bcfb6d7eee7/nuget/google.protobuf/3.21.12/google.protobuf.3.21.12.nupkg.sha512",
+    "/var/folders/6v/bz1tcwc90dg8tr7lwr9dp7nr0000gn/T/cursor-sandbox-cache/148985196e6e520544dd5bcfb6d7eee7/nuget/grpc.core/2.46.6/grpc.core.2.46.6.nupkg.sha512",
+    "/var/folders/6v/bz1tcwc90dg8tr7lwr9dp7nr0000gn/T/cursor-sandbox-cache/148985196e6e520544dd5bcfb6d7eee7/nuget/grpc.core.api/2.46.6/grpc.core.api.2.46.6.nupkg.sha512",
+    "/var/folders/6v/bz1tcwc90dg8tr7lwr9dp7nr0000gn/T/cursor-sandbox-cache/148985196e6e520544dd5bcfb6d7eee7/nuget/grpc.tools/2.59.0/grpc.tools.2.59.0.nupkg.sha512",
+    "/var/folders/6v/bz1tcwc90dg8tr7lwr9dp7nr0000gn/T/cursor-sandbox-cache/148985196e6e520544dd5bcfb6d7eee7/nuget/system.memory/4.5.3/system.memory.4.5.3.nupkg.sha512"
+  ],
+  "logs": []
+}
