@@ -1,13 +1,6 @@
 {
-  "scopedRegistries": [
-    {
-      "name": "OpenUPM",
-      "url": "https://package.openupm.com",
-      "scopes": ["com.github-glitchenzo.nugetforunity"]
-    }
-  ],
   "dependencies": {
-    "com.github-glitchenzo.nugetforunity": "3.1.2",
+    "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
     "com.unity.collab-proxy": "2.6.0",
     "com.unity.feature.development": "1.0.1",
     "com.unity.ml-agents": "file:C:/ml-agents/com.unity.ml-agents",
