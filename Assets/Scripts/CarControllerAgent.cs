@@ -35,7 +35,7 @@ public class CarControllerAgent : Agent
     private int speedMeasurementsCount = 0;
 
 
-    private void Awake() {
+    private new void Awake() {
         carController = GetComponent<CarController>();
         rb = GetComponent<Rigidbody>();
         carSplineStats = GetComponent<CarSplineStats>();
