@@ -4,18 +4,18 @@
     <RestoreSuccess Condition=" '$(RestoreSuccess)' == '' ">True</RestoreSuccess>
     <RestoreTool Condition=" '$(RestoreTool)' == '' ">NuGet</RestoreTool>
     <ProjectAssetsFile Condition=" '$(ProjectAssetsFile)' == '' ">$(MSBuildThisFileDirectory)project.assets.json</ProjectAssetsFile>
-    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">/var/folders/6v/bz1tcwc90dg8tr7lwr9dp7nr0000gn/T/cursor-sandbox-cache/148985196e6e520544dd5bcfb6d7eee7/nuget</NuGetPackageRoot>
-    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">/var/folders/6v/bz1tcwc90dg8tr7lwr9dp7nr0000gn/T/cursor-sandbox-cache/148985196e6e520544dd5bcfb6d7eee7/nuget</NuGetPackageFolders>
+    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">/Users/glebpetrov/.nuget/packages/</NuGetPackageRoot>
+    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">/Users/glebpetrov/.nuget/packages/</NuGetPackageFolders>
     <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">PackageReference</NuGetProjectStyle>
     <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.13.1</NuGetToolVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <SourceRoot Include="/var/folders/6v/bz1tcwc90dg8tr7lwr9dp7nr0000gn/T/cursor-sandbox-cache/148985196e6e520544dd5bcfb6d7eee7/nuget/" />
+    <SourceRoot Include="/Users/glebpetrov/.nuget/packages/" />
   </ItemGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Import Project="$(NuGetPackageRoot)/grpc.tools/2.59.0/build/Grpc.Tools.props" Condition="Exists('$(NuGetPackageRoot)/grpc.tools/2.59.0/build/Grpc.Tools.props')" />
+    <Import Project="$(NuGetPackageRoot)grpc.tools/2.59.0/build/Grpc.Tools.props" Condition="Exists('$(NuGetPackageRoot)grpc.tools/2.59.0/build/Grpc.Tools.props')" />
   </ImportGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgGrpc_Tools Condition=" '$(PkgGrpc_Tools)' == '' ">/var/folders/6v/bz1tcwc90dg8tr7lwr9dp7nr0000gn/T/cursor-sandbox-cache/148985196e6e520544dd5bcfb6d7eee7/nuget/grpc.tools/2.59.0</PkgGrpc_Tools>
+    <PkgGrpc_Tools Condition=" '$(PkgGrpc_Tools)' == '' ">/Users/glebpetrov/.nuget/packages/grpc.tools/2.59.0</PkgGrpc_Tools>
   </PropertyGroup>
 </Project>

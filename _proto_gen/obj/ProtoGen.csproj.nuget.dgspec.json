@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/glebpetrov/Diploma2025/_proto_gen/ProtoGen.csproj": {}
+    "/Users/glebpetrov/rl_grpc/Diploma2025/_proto_gen/ProtoGen.csproj": {}
   },
   "projects": {
-    "/Users/glebpetrov/Diploma2025/_proto_gen/ProtoGen.csproj": {
+    "/Users/glebpetrov/rl_grpc/Diploma2025/_proto_gen/ProtoGen.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/glebpetrov/Diploma2025/_proto_gen/ProtoGen.csproj",
+        "projectUniqueName": "/Users/glebpetrov/rl_grpc/Diploma2025/_proto_gen/ProtoGen.csproj",
         "projectName": "ProtoGen",
-        "projectPath": "/Users/glebpetrov/Diploma2025/_proto_gen/ProtoGen.csproj",
-        "packagesPath": "/var/folders/6v/bz1tcwc90dg8tr7lwr9dp7nr0000gn/T/cursor-sandbox-cache/148985196e6e520544dd5bcfb6d7eee7/nuget",
-        "outputPath": "/Users/glebpetrov/Diploma2025/_proto_gen/obj/",
+        "projectPath": "/Users/glebpetrov/rl_grpc/Diploma2025/_proto_gen/ProtoGen.csproj",
+        "packagesPath": "/Users/glebpetrov/.nuget/packages/",
+        "outputPath": "/Users/glebpetrov/rl_grpc/Diploma2025/_proto_gen/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/glebpetrov/.nuget/NuGet/NuGet.Config"
