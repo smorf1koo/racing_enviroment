@@ -43,6 +43,7 @@ public class UnityRacingGrpcServer : MonoBehaviour
         _server.Start();
 
         _lastCumulativeReward = agent.GetCumulativeReward();
+        agent.SetExternalControl(true);
         Debug.Log($"[UnityRacingGrpcServer] gRPC server listening on port {port}");
     }
 

@@ -32,6 +32,9 @@ public class CarControllerAgent : MonoBehaviour
     private int speedMeasurementsCount = 0;
 
     private float _cumulativeReward = 0f;
+    private bool _externalControl = false;
+
+    public void SetExternalControl(bool value) => _externalControl = value;
 
     private void Awake() {
         carController = GetComponent<CarController>();
@@ -80,7 +83,7 @@ public class CarControllerAgent : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!start) return;
+        if (!start || _externalControl) return;
 
         float forwardAmount, turnAmount;
         if (isPlayer)
