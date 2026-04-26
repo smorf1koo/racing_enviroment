@@ -16,7 +16,7 @@ public class UnityRacingGrpcServer : MonoBehaviour
 
     private Server _server;
     private float _lastCumulativeReward;
-    private const int FixedFramesPerStep = 4;
+
 
     private void Awake()
     {
@@ -97,8 +97,6 @@ public class UnityRacingGrpcServer : MonoBehaviour
             var result = UnityMainThreadDispatcher.Instance().EnqueueAndWait(() =>
             {
                 _agent.ApplyAction(fwd, trn);
-                for (int i = 0; i < FixedFramesPerStep; i++)
-                    Physics.Simulate(Time.fixedDeltaTime);
 
                 float current = _agent.GetCumulativeReward();
                 float stepReward = current - _owner.GetLastCumulativeReward();
