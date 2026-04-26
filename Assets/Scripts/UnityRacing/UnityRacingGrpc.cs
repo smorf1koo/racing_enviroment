@@ -1,4 +1,4 @@
-// Hand-written gRPC stub compatible with Grpc.Core bundled by ML-Agents (pre-2.28 API).
+// Hand-written gRPC stub compatible with Grpc.Core 2.46.6 (NuGet).
 #pragma warning disable 0414, 1591, 8981, 0612
 #region Designer generated code
 

@@ -1,2 +1,0 @@
-obj/Debug/net9.0/UnityRacing.cs \
-obj/Debug/net9.0/UnityRacingGrpc.cs: ../Assets/Proto/unity_racing.proto

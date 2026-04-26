@@ -1,27 +1,17 @@
 using UnityEngine;
-using Unity.MLAgents.Sensors;
 
 public class DebugCameraSensor : MonoBehaviour
 {
     void Start()
     {
-        var sensorComponent = GetComponent<CameraSensorComponent>();
-        if (sensorComponent != null)
+        var camera = GetComponent<Camera>();
+        if (camera != null)
         {
-            Debug.Log("CameraSensorComponent найден.");
-            if (sensorComponent.Camera == null)
-            {
-                Debug.LogError("Камера не назначена в CameraSensorComponent!");
-            }
-            else
-            {
-                Debug.Log($"Камера назначена: {sensorComponent.Camera.name}");
-            }
+            Debug.Log($"Camera found: {camera.name}");
         }
         else
         {
-            Debug.LogError("CameraSensorComponent не найден на объекте!");
+            Debug.LogError("Camera not found on this object!");
         }
     }
 }
-

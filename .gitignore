@@ -97,3 +97,10 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Unity package lock (auto-regenerated)
+Packages/packages-lock.json
+
+# Proto generator build artifacts
+_proto_gen/obj/
+_proto_gen/bin/

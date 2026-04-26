@@ -1,12 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.MLAgents;
-using Unity.MLAgents.Actuators;
-using Unity.MLAgents.Sensors;
 using UnityEngine.UI;
 
-public class CarControllerAgent : Agent
+public class CarControllerAgent : MonoBehaviour
 {
     [SerializeField] private TrackCheckpoints trackCheckpoints;
     [SerializeField] private Transform spawnPosition;
@@ -22,7 +19,7 @@ public class CarControllerAgent : Agent
     [SerializeField] private CarSplineStats carSplineStats;
     private bool start = false;
     private int checksOver = 0;
-//
+
     private int stepCount = 0;
     private CarController carController;
     private SplineCalculator splineCalculator;
@@ -34,8 +31,9 @@ public class CarControllerAgent : Agent
     private float totalSpeed = 0f;
     private int speedMeasurementsCount = 0;
 
+    private float _cumulativeReward = 0f;
 
-    private new void Awake() {
+    private void Awake() {
         carController = GetComponent<CarController>();
         rb = GetComponent<Rigidbody>();
         carSplineStats = GetComponent<CarSplineStats>();
@@ -80,6 +78,29 @@ public class CarControllerAgent : Agent
         }
     }
 
+    private void FixedUpdate()
+    {
+        if (!start) return;
+
+        float forwardAmount, turnAmount;
+        if (isPlayer)
+        {
+            forwardAmount = Input.GetAxis("Vertical");
+            turnAmount = Input.GetAxis("Horizontal");
+        }
+        else if (aiController != null)
+        {
+            forwardAmount = aiController.InputVerticalAI();
+            turnAmount = aiController.InputHorizontalAI();
+        }
+        else
+        {
+            return;
+        }
+
+        ApplyAction(forwardAmount, turnAmount);
+    }
+
     void Update()
     {
         if (start == true)
@@ -118,7 +139,8 @@ public class CarControllerAgent : Agent
                 totalErrors -= 0.001f;
         }
     }
-    public override void OnEpisodeBegin()
+
+    public void OnEpisodeBegin()
     {
         transform.position = spawnPosition.position + new Vector3(Random.Range(-1f,1f),0,Random.Range(-1f,1f));
         transform.forward = spawnPosition.forward;
@@ -129,12 +151,29 @@ public class CarControllerAgent : Agent
         totalErrors = 0f;
 
         stepCount = 0;
+        _cumulativeReward = 0f;
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
     }
     public float ProgressAgent()
     {
         return carSplineStats.GetProgressAlongSpline();
+    }
+
+    public void AddReward(float reward)
+    {
+        _cumulativeReward += reward;
+    }
+
+    public float GetCumulativeReward()
+    {
+        return _cumulativeReward;
+    }
+
+    public void EndEpisode()
+    {
+        _cumulativeReward = 0f;
+        OnEpisodeBegin();
     }
 
     /// <summary>
@@ -191,78 +230,16 @@ public class CarControllerAgent : Agent
         return false;
     }
 
-    public override void CollectObservations(VectorSensor sensor)
-    {
-        sensor.AddObservation(carSplineStats.GetDistanceToSpline());
-        sensor.AddObservation(carSplineStats.GetProgressAlongSpline());
-        sensor.AddObservation(carSplineStats.GetAngleToSplineDirection());
-        sensor.AddObservation(carSplineStats.GetLocalCurvature());
-        float distance = trackCheckpoints.GetDistanceToNextCheckpoint(transform);
-        sensor.AddObservation(distance);
-        Vector3 checkpointForward = trackCheckpoints.GetNextCheckpoint(transform).transform.forward;
-        float directionDot = Vector3.Dot(transform.forward, checkpointForward);
-        sensor.AddObservation(directionDot);
-        sensor.AddObservation(rb.velocity.magnitude);
-    }
-    public override void OnActionReceived(ActionBuffers actions)
-    {
-        float forwardAmount = 0f;
-        float turnAmount = 0f;
-        forwardAmount = actions.ContinuousActions[0];
-        Debug.LogWarning(actions.ContinuousActions[0]);
-        if (forwardAmount > 0f)
-        {
-            AddReward(forwardSpeedReward);
-        }
-        turnAmount = actions.ContinuousActions[1];
-        carController.SetInput(forwardAmount,turnAmount);
-
-        AddReward(perStepPenalty);
-        totalErrors -= perStepPenalty;
-
-        stepCount++;
-        if (stepCount >= maxSteps)
-        {
-            Debug.Log(spentTime);
-            AddReward(-100f);
-            totalErrors -= 100f;
-            Debug.Log(totalErrors);
-            Debug.Log(GetCumulativeReward());
-            Debug.Log(totalSpeed/speedMeasurementsCount);
-            EndEpisode();
-        }
-    }
-    public override void Heuristic(in ActionBuffers actionsOut)
-    {
-        float forwardAction = 0f;
-        float turnAction = 0f;
-        if (isPlayer)
-        {
-            forwardAction = Input.GetAxis("Vertical");
-            turnAction = Input.GetAxis("Horizontal");
-        } else
-        {
-            forwardAction = aiController.InputVerticalAI();
-            turnAction = aiController.InputHorizontalAI();
-        }
-
-        ActionSegment<float> continuousActions = actionsOut.ContinuousActions;
-        continuousActions[0] = forwardAction;
-        continuousActions[1] = turnAction;
-    }
-
     private void OnCollisionEnter(Collision other) {
         if (other.gameObject.TryGetComponent<Wall>(out Wall wall))
         {
             AddReward(-10f);
             totalErrors -= 10f;
-            //EndEpisode();
         }
         if (other.gameObject.TryGetComponent<Player>(out Player player))
         {
             AddReward(-10f);
             totalErrors -= 10f;
-            //EndEpisode();
         }
     }
     private void OnCollisionStay(Collision other) {
