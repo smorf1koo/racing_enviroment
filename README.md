@@ -11,13 +11,9 @@
 ### Первый запуск после клонирования
 
 1. Откройте проект в Unity **2022.3.51f1**.
-2. Unity автоматически установит пакеты из `manifest.json` (включая NuGetForUnity).
-3. После загрузки откройте **NuGet → Restore Packages** (или дождитесь автоматического восстановления).
-   NuGetForUnity установит `Google.Protobuf 3.21.12` и `Grpc.Core 2.46.6` по `Assets/packages.config`.
-4. Откройте сцену `Assets/Scenes/Env_Alone.unity`.
-5. Нажмите **Play**.
-
-> Если пакеты NuGet не восстановились автоматически: **NuGet → Manage NuGet Packages → Restore**.
+2. Дождитесь завершения импорта (все DLL уже в `Assets/Plugins/gRPC/`).
+3. Откройте сцену `Assets/Scenes/Env_Alone.unity`.
+4. Нажмите **Play**.
 
 ### Запуск с gRPC (внешнее RL-обучение)
 
@@ -87,9 +83,13 @@ service UnityRacingService {
 - `com.github-glitchenzo.nugetforunity` — менеджер NuGet-пакетов
 - `com.unity.textmeshpro`, `com.unity.ugui`, `com.unity.visualscripting`
 
-### NuGet-пакеты (Assets/packages.config)
+### gRPC/Protobuf (Assets/Plugins/gRPC/, закоммичены в репо)
 - `Google.Protobuf 3.21.12`
 - `Grpc.Core 2.46.6`
+- `Grpc.Core.Api 2.46.6`
+- `System.Memory 4.5.3`
+- `System.Runtime.CompilerServices.Unsafe 6.0.0`
+- Нативные библиотеки gRPC для Windows/macOS/Linux
 
 ## Структура проекта
 
