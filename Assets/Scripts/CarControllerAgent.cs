@@ -33,6 +33,7 @@ public class CarControllerAgent : MonoBehaviour
 
     private float _cumulativeReward = 0f;
     private bool _externalControl = false;
+    private bool _episodeDone = false;
 
     public void SetExternalControl(bool value) => _externalControl = value;
 
@@ -127,7 +128,10 @@ public class CarControllerAgent : MonoBehaviour
                 Debug.Log(totalErrors);
                 Debug.Log(GetCumulativeReward());
                 Debug.Log(totalSpeed/speedMeasurementsCount);
-                EndEpisode();
+                if (_externalControl)
+                    _episodeDone = true;
+                else
+                    EndEpisode();
             } else if (checksOver == TrackCheckpoints.GetChecks())
             {
                 Debug.Log(spentTime);
@@ -135,7 +139,10 @@ public class CarControllerAgent : MonoBehaviour
                 Debug.Log(totalErrors);
                 Debug.Log(GetCumulativeReward());
                 Debug.Log(totalSpeed/speedMeasurementsCount);
-                EndEpisode();
+                if (_externalControl)
+                    _episodeDone = true;
+                else
+                    EndEpisode();
             }
             if (carController.CurrentSpeed() < 0.5f)
                 AddReward(-0.001f);
@@ -155,6 +162,7 @@ public class CarControllerAgent : MonoBehaviour
 
         stepCount = 0;
         _cumulativeReward = 0f;
+        _episodeDone = false;
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
     }
@@ -218,7 +226,10 @@ public class CarControllerAgent : MonoBehaviour
         {
             AddReward(-100f);
             totalErrors -= 100f;
-            EndEpisode();
+            if (_externalControl)
+                _episodeDone = true;
+            else
+                EndEpisode();
         }
     }
 
@@ -227,10 +238,7 @@ public class CarControllerAgent : MonoBehaviour
     /// </summary>
     public bool IsEpisodeDone()
     {
-        if (timer <= 0f) return true;
-        if (checksOver == TrackCheckpoints.GetChecks()) return true;
-        if (stepCount >= maxSteps) return true;
-        return false;
+        return _episodeDone || timer <= 0f || checksOver == TrackCheckpoints.GetChecks() || stepCount >= maxSteps;
     }
 
     private void OnCollisionEnter(Collision other) {
