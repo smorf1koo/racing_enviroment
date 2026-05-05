@@ -51,6 +51,20 @@ public class CarController : MonoBehaviour
 
     void FixedUpdate()
     {
+        // При ручном шаге физики (Physics.autoSimulation = false)
+        // управление вызываем явно из gRPC-пайплайна.
+        if (!Physics.autoSimulation)
+            return;
+        Tick();
+    }
+
+    /// <summary>
+    /// Один “фиксированный” тик физического управления.
+    /// Используется и в ручном Step-режиме gRPC, чтобы гарантировать,
+    /// что новые входы применились до Physics.Simulate().
+    /// </summary>
+    public void Tick()
+    {
         GetGear();
         CheckInput();
         HandleMotor();

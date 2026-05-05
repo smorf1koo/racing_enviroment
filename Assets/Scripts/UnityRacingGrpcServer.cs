@@ -16,6 +16,7 @@ public class UnityRacingGrpcServer : MonoBehaviour
 
     private Server _server;
     private float _lastCumulativeReward;
+    private bool _prevAutoSimulation;
 
 
     private void Awake()
@@ -42,6 +43,11 @@ public class UnityRacingGrpcServer : MonoBehaviour
         };
         _server.Start();
 
+        // Мы сами делаем Physics.Simulate() внутри Step(), чтобы observation
+        // собирался строго “после одного физического шага”.
+        _prevAutoSimulation = Physics.autoSimulation;
+        Physics.autoSimulation = false;
+
         _lastCumulativeReward = agent.GetCumulativeReward();
         agent.SetExternalControl(true);
         Debug.Log($"[UnityRacingGrpcServer] gRPC server listening on port {port}");
@@ -50,6 +56,7 @@ public class UnityRacingGrpcServer : MonoBehaviour
     private void OnDestroy()
     {
         _server?.ShutdownAsync().Wait();
+        Physics.autoSimulation = _prevAutoSimulation;
     }
 
     internal void SetLastCumulativeReward(float value) => _lastCumulativeReward = value;
@@ -97,6 +104,10 @@ public class UnityRacingGrpcServer : MonoBehaviour
             var result = UnityMainThreadDispatcher.Instance().EnqueueAndWait(() =>
             {
                 _agent.ApplyAction(fwd, trn);
+                
+                float dt = Time.fixedDeltaTime;
+                Physics.Simulate(dt);
+                _agent.TickFromGrpc(dt);
 
                 float current = _agent.GetCumulativeReward();
                 float stepReward = current - _owner.GetLastCumulativeReward();

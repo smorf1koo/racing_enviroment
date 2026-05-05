@@ -110,6 +110,11 @@ public class CarControllerAgent : MonoBehaviour
 
     void Update()
     {
+        // Во время обучения физика шагается вручную из gRPC,
+        // поэтому Update() нельзя выполнять, иначе таймер/награды будут считаться дважды.
+        if (_externalControl)
+            return;
+
         if (start == true)
         {
             if (splineCalculator.GetDistanceToSpline(transform.position) < 2) AddReward(0.005f);
@@ -151,8 +156,57 @@ public class CarControllerAgent : MonoBehaviour
                     EndEpisode();
             }
             if (carController.CurrentSpeed() < 0.5f)
+            {
                 AddReward(-0.001f);
                 totalErrors -= 0.001f;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Выполняет “тик” наград/таймера/признаков ровно один раз после Physics.Simulate(dt).
+    /// Вызывается из UnityRacingGrpcServer при external control.
+    /// </summary>
+    public void TickFromGrpc(float dt)
+    {
+        if (!start)
+            return;
+
+        // Шэйпинг по близости к сплайну/скорости.
+        if (splineCalculator.GetDistanceToSpline(transform.position) < 2)
+            AddReward(0.005f);
+
+        if ((carController.CurrentSpeed() * 3.6 >= 20f) && (carController.IsMovingForward()))
+            AddReward(0.005f);
+
+        totalSpeed += carController.CurrentSpeed() * 3.6f;
+        speedMeasurementsCount++;
+
+        timer -= dt;
+        spentTime += dt;
+
+        if (_isTouchingWall)
+            _wallContactStreakSec += dt;
+
+        UpdateMovingBackwardFlag();
+
+        // Условия завершения эпизода.
+        if (timer <= 0)
+        {
+            AddReward(-20f);
+            totalErrors -= 20f;
+            _episodeDone = true; // в gRPC-режиме завершаем эпизод флагом
+        }
+        else if (checksOver == TrackCheckpoints.GetChecks())
+        {
+            AddReward(5000f);
+            _episodeDone = true;
+        }
+
+        if (carController.CurrentSpeed() < 0.5f)
+        {
+            AddReward(-0.001f);
+            totalErrors -= 0.001f;
         }
     }
 
@@ -264,6 +318,9 @@ public class CarControllerAgent : MonoBehaviour
             AddReward(forwardSpeedReward);
 
         carController.SetInput(forwardAmount, turnAmount);
+        // В external control режиме нужно гарантировать, что входы применятся до Physics.Simulate().
+        if (_externalControl)
+            carController.Tick();
         AddReward(perStepPenalty);
         totalErrors -= perStepPenalty;
 
