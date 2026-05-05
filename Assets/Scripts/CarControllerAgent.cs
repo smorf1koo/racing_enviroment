@@ -212,7 +212,17 @@ public class CarControllerAgent : MonoBehaviour
 
         var nextCheckpoint = trackCheckpoints.GetNextCheckpoint(transform);
         obs[4] = nextCheckpoint != null ? trackCheckpoints.GetDistanceToNextCheckpoint(transform) : 0f;
-        obs[5] = nextCheckpoint != null ? Vector3.Dot(transform.forward, nextCheckpoint.transform.forward) : 0f;
+        if (nextCheckpoint != null)
+        {
+            Vector3 dirToCheckpoint = nextCheckpoint.transform.position - transform.position;
+            obs[5] = dirToCheckpoint.sqrMagnitude > 1e-6f
+                ? Vector3.Dot(transform.forward, dirToCheckpoint.normalized)
+                : 0f;
+        }
+        else
+        {
+            obs[5] = 0f;
+        }
 
         obs[6] = rb.velocity.magnitude;
         obs[7] = _wallContactStreakSec;
