@@ -7,10 +7,10 @@ public class CarControllerAgent : MonoBehaviour
 {
     [SerializeField] private TrackCheckpoints trackCheckpoints;
     [SerializeField] private Transform spawnPosition;
-    [SerializeField] private int maxSteps = 3000;
+    [SerializeField] private int maxSteps = 15000;
     private float forwardSpeedReward = 0.01f;
     private float perStepPenalty = -0.001f;
-    [SerializeField] private float timer = 120f;
+    [SerializeField] private float timer = 300f;
     [SerializeField] private Text value;
     [SerializeField] private Text checksGone;
     [SerializeField] private Text allChecks;
@@ -217,7 +217,7 @@ public class CarControllerAgent : MonoBehaviour
         transform.forward = spawnPosition.forward;
         trackCheckpoints.ResetCheckpoint(transform);
         checksOver = 0;
-        timer = 120f;
+        timer = 300f;
         spentTime = 0f;
         totalErrors = 0f;
 
