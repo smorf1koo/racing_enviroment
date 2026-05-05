@@ -113,7 +113,10 @@ public class CarControllerAgent : MonoBehaviour
         // Во время обучения физика шагается вручную из gRPC,
         // поэтому Update() нельзя выполнять, иначе таймер/награды будут считаться дважды.
         if (_externalControl)
+        {
+            UpdateUi();
             return;
+        }
 
         if (start == true)
         {
@@ -121,16 +124,12 @@ public class CarControllerAgent : MonoBehaviour
             if ((carController.CurrentSpeed() * 3.6 >= 20f) && (carController.IsMovingForward())) AddReward(0.005f);
             totalSpeed += carController.CurrentSpeed() * 3.6f;
             speedMeasurementsCount++;
-            speedText.text = (carController.CurrentSpeed() * 3.6).ToString("0.0");
             timer -= Time.deltaTime;
             spentTime += Time.deltaTime;
             if (_isTouchingWall)
                 _wallContactStreakSec += Time.deltaTime;
             UpdateMovingBackwardFlag();
-            value.text = timer.ToString("0.00");
-            checksGone.text = checksOver.ToString();
-            allChecks.text = TrackCheckpoints.GetChecks().ToString();
-            rewardNum.text = GetCumulativeReward().ToString("0.000");
+            UpdateUi();
             if (timer <= 0)
             {
                 Debug.Log(spentTime);
@@ -208,6 +207,8 @@ public class CarControllerAgent : MonoBehaviour
             AddReward(-0.001f);
             totalErrors -= 0.001f;
         }
+
+        UpdateUi();
     }
 
     public void OnEpisodeBegin()
@@ -242,6 +243,20 @@ public class CarControllerAgent : MonoBehaviour
     public float GetCumulativeReward()
     {
         return _cumulativeReward;
+    }
+
+    private void UpdateUi()
+    {
+        if (speedText != null)
+            speedText.text = (carController.CurrentSpeed() * 3.6).ToString("0.0");
+        if (value != null)
+            value.text = timer.ToString("0.00");
+        if (checksGone != null)
+            checksGone.text = checksOver.ToString();
+        if (allChecks != null)
+            allChecks.text = TrackCheckpoints.GetChecks().ToString();
+        if (rewardNum != null)
+            rewardNum.text = GetCumulativeReward().ToString("0.000");
     }
 
     public void EndEpisode()
