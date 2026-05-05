@@ -34,6 +34,9 @@ public class CarControllerAgent : MonoBehaviour
     private float _cumulativeReward = 0f;
     private bool _externalControl = false;
     private bool _episodeDone = false;
+    private bool _isTouchingWall = false;
+    private float _wallContactStreakSec = 0f;
+    private float _isMovingBackwardFlag = 0f;
 
     public void SetExternalControl(bool value) => _externalControl = value;
 
@@ -116,6 +119,9 @@ public class CarControllerAgent : MonoBehaviour
             speedText.text = (carController.CurrentSpeed() * 3.6).ToString("0.0");
             timer -= Time.deltaTime;
             spentTime += Time.deltaTime;
+            if (_isTouchingWall)
+                _wallContactStreakSec += Time.deltaTime;
+            UpdateMovingBackwardFlag();
             value.text = timer.ToString("0.00");
             checksGone.text = checksOver.ToString();
             allChecks.text = TrackCheckpoints.GetChecks().ToString();
@@ -163,6 +169,9 @@ public class CarControllerAgent : MonoBehaviour
         stepCount = 0;
         _cumulativeReward = 0f;
         _episodeDone = false;
+        _isTouchingWall = false;
+        _wallContactStreakSec = 0f;
+        _isMovingBackwardFlag = 0f;
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
     }
@@ -188,13 +197,14 @@ public class CarControllerAgent : MonoBehaviour
     }
 
     /// <summary>
-    /// Возвращает вектор наблюдений для gRPC/TCP сервера (7 float).
+    /// Возвращает вектор наблюдений для gRPC/TCP сервера (9 float).
     /// Порядок: distance_to_spline, progress, angle_to_spline, curvature,
-    /// distance_to_checkpoint, direction_dot, speed.
+    /// distance_to_checkpoint, direction_dot, speed, wall_contact_streak_sec,
+    /// moving_backward_flag.
     /// </summary>
     public float[] GetObservationVector()
     {
-        var obs = new float[7];
+        var obs = new float[9];
         obs[0] = carSplineStats.GetDistanceToSpline();
         obs[1] = carSplineStats.GetProgressAlongSpline();
         obs[2] = carSplineStats.GetAngleToSplineDirection();
@@ -205,7 +215,33 @@ public class CarControllerAgent : MonoBehaviour
         obs[5] = nextCheckpoint != null ? Vector3.Dot(transform.forward, nextCheckpoint.transform.forward) : 0f;
 
         obs[6] = rb.velocity.magnitude;
+        obs[7] = _wallContactStreakSec;
+        obs[8] = _isMovingBackwardFlag;
         return obs;
+    }
+
+    private void UpdateMovingBackwardFlag()
+    {
+        var nextCheckpoint = trackCheckpoints.GetNextCheckpoint(transform);
+        var previousCheckpoint = trackCheckpoints.GetPreviousCheckpoint(transform);
+
+        if (nextCheckpoint == null || previousCheckpoint == null)
+        {
+            _isMovingBackwardFlag = 0f;
+            return;
+        }
+
+        Vector3 trackForward = (nextCheckpoint.transform.position - previousCheckpoint.transform.position).normalized;
+        Vector3 velocity = rb.velocity;
+
+        if (velocity.sqrMagnitude < 0.01f || trackForward.sqrMagnitude < 0.0001f)
+        {
+            _isMovingBackwardFlag = 0f;
+            return;
+        }
+
+        float motionAlongTrack = Vector3.Dot(velocity.normalized, trackForward);
+        _isMovingBackwardFlag = motionAlongTrack < -0.1f ? 1f : 0f;
     }
 
     /// <summary>
@@ -256,8 +292,17 @@ public class CarControllerAgent : MonoBehaviour
     private void OnCollisionStay(Collision other) {
         if (other.gameObject.TryGetComponent<Wall>(out Wall wall))
         {
+            _isTouchingWall = true;
             AddReward(-0.1f);
             totalErrors -= 0.1f;
+        }
+    }
+
+    private void OnCollisionExit(Collision other) {
+        if (other.gameObject.TryGetComponent<Wall>(out Wall wall))
+        {
+            _isTouchingWall = false;
+            _wallContactStreakSec = 0f;
         }
     }
 }

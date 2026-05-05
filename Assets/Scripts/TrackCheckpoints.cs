@@ -14,6 +14,7 @@ public class TrackCheckpoints : MonoBehaviour {
     public class CarCheckpointEventArgs : EventArgs
     {
         public Transform carTransform;
+        public bool isPreviousCheckpoint;
     }
     public CarController[] carControllers;
     private List<Transform> carTransformList;
@@ -71,6 +72,8 @@ public class TrackCheckpoints : MonoBehaviour {
         }
 
         int nextCheckpointSingleIndex = nextCheckpointSingleIndexList[carIndex];
+        int crossedCheckpointIndex = checkpointSingleList.IndexOf(checkpointSingle);
+        int previousCheckpointIndex = (nextCheckpointSingleIndex - 1 + checkpointSingleList.Count) % checkpointSingleList.Count;
         if (checkpointSingleList.IndexOf(checkpointSingle) == nextCheckpointSingleIndex) {
             // Правильный чекпоинт
             //Debug.Log("Correct checkpoint");
@@ -83,7 +86,10 @@ public class TrackCheckpoints : MonoBehaviour {
             nextCheckpointSingleIndexList[carIndex] = (nextCheckpointSingleIndex + 1) % checkpointSingleList.Count;
 
             // Вызываем событие для правильного чекпоинта
-            OnPlayerCorrectCheckpoint?.Invoke(this, new CarCheckpointEventArgs { carTransform = carTransform });
+            OnPlayerCorrectCheckpoint?.Invoke(this, new CarCheckpointEventArgs {
+                carTransform = carTransform,
+                isPreviousCheckpoint = false
+            });
         } else {
             // Неправильный чекпоинт
             //Debug.Log("Wrong checkpoint");
@@ -93,7 +99,10 @@ public class TrackCheckpoints : MonoBehaviour {
             correctCheckpointSingle.Show();
 
             // Вызываем событие для неправильного чекпоинта
-            OnPlayerWrongCheckpoint?.Invoke(this, new CarCheckpointEventArgs { carTransform = carTransform });
+            OnPlayerWrongCheckpoint?.Invoke(this, new CarCheckpointEventArgs {
+                carTransform = carTransform,
+                isPreviousCheckpoint = crossedCheckpointIndex == previousCheckpointIndex
+            });
         }
     }
     // Метод для получения расстояния до следующего чекпоинта
@@ -118,6 +127,19 @@ public class TrackCheckpoints : MonoBehaviour {
         }
         int nextCheckpointIndex = nextCheckpointSingleIndexList[carIndex];
         return checkpointSingleList[nextCheckpointIndex];
+    }
+
+    // Метод для получения предыдущего (уже пройденного) чекпоинта для машины
+    public CheckpointSingle GetPreviousCheckpoint(Transform carTransform) {
+        int carIndex = carTransformList.IndexOf(carTransform);
+        if (carIndex == -1) {
+            Debug.LogWarning("Car not found in carTransformList");
+            return null;
+        }
+
+        int nextCheckpointIndex = nextCheckpointSingleIndexList[carIndex];
+        int previousCheckpointIndex = (nextCheckpointIndex - 1 + checkpointSingleList.Count) % checkpointSingleList.Count;
+        return checkpointSingleList[previousCheckpointIndex];
     }
 
     // Метод для сброса состояния чекпоинтов для машины

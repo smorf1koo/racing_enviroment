@@ -27,9 +27,9 @@
 Python RL-клиент  ←— gRPC (порт 50051) —→  Unity (CarControllerAgent)
      │                                           │
      │  StepRequest(action[2])                   │  ApplyAction(fwd, turn)
-     │  StepResponse(obs[7], reward, done)       │  GetObservationVector()
+     │  StepResponse(obs[9], reward, done)       │  GetObservationVector()
      │  ResetRequest(seed)                       │  OnEpisodeBegin()
-     │  ResetResponse(obs[7])                    │
+     │  ResetResponse(obs[9])                    │
 ```
 
 ### Протокол (unity_racing.proto)
@@ -42,7 +42,7 @@ service UnityRacingService {
 ```
 
 - **Действия**: 2 continuous float — `[forward, turn]`, каждый в `[-1, 1]`
-- **Наблюдения**: 7 float — расстояние до сплайна, прогресс, угол к сплайну, кривизна, расстояние до чекпоинта, dot направлений, скорость
+- **Наблюдения**: 9 float — расстояние до сплайна, прогресс, угол к сплайну, кривизна, расстояние до чекпоинта, dot направлений, скорость, длительность непрерывного контакта со стеной, флаг движения назад по трассе
 
 ## Управление
 
