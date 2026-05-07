@@ -82,13 +82,10 @@ public class CarSplineStats : MonoBehaviour
     public float GetAngleToSplineDirection()
     {
         int index = GetClosestSplineIndex();
-        if (index < splineCalculator.splinePoints.Length - 1)
-        {
-            Vector3 splineDir = (splineCalculator.splinePoints[index + 1] - splineCalculator.splinePoints[index]).normalized;
-            float angle = Vector3.SignedAngle(carTransform.forward, splineDir, Vector3.up);
-            return angle;
-        }
-        return 0f;
+        int len = splineCalculator.splinePoints.Length;
+        int nextIndex = (index + 1) % len;
+        Vector3 splineDir = (splineCalculator.splinePoints[nextIndex] - splineCalculator.splinePoints[index]).normalized;
+        return Vector3.SignedAngle(carTransform.forward, splineDir, Vector3.up);
     }
 
     /// <summary>
@@ -97,16 +94,13 @@ public class CarSplineStats : MonoBehaviour
     public float GetLocalCurvature()
     {
         int i = GetClosestSplineIndex();
-        if (i > 0 && i < splineCalculator.splinePoints.Length - 1)
-        {
-            Vector3 a = splineCalculator.splinePoints[i - 1];
-            Vector3 b = splineCalculator.splinePoints[i];
-            Vector3 c = splineCalculator.splinePoints[i + 1];
+        int len = splineCalculator.splinePoints.Length;
+        Vector3 a = splineCalculator.splinePoints[(i - 1 + len) % len];
+        Vector3 b = splineCalculator.splinePoints[i];
+        Vector3 c = splineCalculator.splinePoints[(i + 1) % len];
 
-            Vector3 ab = (b - a).normalized;
-            Vector3 bc = (c - b).normalized;
-            return Vector3.Angle(ab, bc); 
-        }
-        return 0f;
+        Vector3 ab = (b - a).normalized;
+        Vector3 bc = (c - b).normalized;
+        return Vector3.Angle(ab, bc);
     }
 }

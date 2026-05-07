@@ -64,6 +64,11 @@ public class SplineCalculator : MonoBehaviour
             }
         }
 
+        // Замыкающий сегмент (последняя точка → первая) для замкнутой трассы.
+        float closingDist = DistanceToSegment(point, splinePoints[splinePoints.Length - 1], splinePoints[0]);
+        if (closingDist < minDistance)
+            minDistance = closingDist;
+
         return minDistance;
     }
 

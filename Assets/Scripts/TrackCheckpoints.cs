@@ -150,5 +150,6 @@ public class TrackCheckpoints : MonoBehaviour {
             return;
         }
         nextCheckpointSingleIndexList[carIndex] = 0;
+        checkpointSingleList[0].Show();
     }
 }

@@ -37,6 +37,7 @@ public class CarControllerAgent : MonoBehaviour
     private bool _isTouchingWall = false;
     private float _wallContactStreakSec = 0f;
     private float _isMovingBackwardFlag = 0f;
+    private float _lastForwardAmount = 0f;
     private float _maxWallRayDist = 20f;
     private Vector3 _rayOriginOffset = new Vector3(0f, 0.5f, 0f);
 
@@ -173,6 +174,21 @@ public class CarControllerAgent : MonoBehaviour
         if (!start)
             return;
 
+        // Награды за действие (после физики, чтобы оценивать результат).
+        if (_lastForwardAmount > 0f)
+            AddReward(forwardSpeedReward);
+        AddReward(perStepPenalty);
+        totalErrors -= perStepPenalty;
+
+        stepCount++;
+        if (stepCount >= maxSteps)
+        {
+            AddReward(-100f);
+            totalErrors -= 100f;
+            _episodeDone = true;
+            return;
+        }
+
         // Шэйпинг по близости к сплайну/скорости.
         if (splineCalculator.GetDistanceToSpline(transform.position) < 2)
             AddReward(0.005f);
@@ -232,6 +248,7 @@ public class CarControllerAgent : MonoBehaviour
         _isMovingBackwardFlag = 0f;
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+        carController.ResetState();
     }
     public float ProgressAgent()
     {
@@ -347,25 +364,27 @@ public class CarControllerAgent : MonoBehaviour
     /// </summary>
     public void ApplyAction(float forwardAmount, float turnAmount)
     {
-        if (forwardAmount > 0f)
-            AddReward(forwardSpeedReward);
-
+        _lastForwardAmount = forwardAmount;
         carController.SetInput(forwardAmount, turnAmount);
         // В external control режиме нужно гарантировать, что входы применятся до Physics.Simulate().
         if (_externalControl)
             carController.Tick();
-        AddReward(perStepPenalty);
-        totalErrors -= perStepPenalty;
 
-        stepCount++;
-        if (stepCount >= maxSteps)
+        // В external control счётчик шагов и награды обрабатываются в TickFromGrpc().
+        if (!_externalControl)
         {
-            AddReward(-100f);
-            totalErrors -= 100f;
-            if (_externalControl)
-                _episodeDone = true;
-            else
+            if (forwardAmount > 0f)
+                AddReward(forwardSpeedReward);
+            AddReward(perStepPenalty);
+            totalErrors -= perStepPenalty;
+
+            stepCount++;
+            if (stepCount >= maxSteps)
+            {
+                AddReward(-100f);
+                totalErrors -= 100f;
                 EndEpisode();
+            }
         }
     }
 

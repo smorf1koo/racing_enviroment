@@ -155,6 +155,21 @@ public class CarController : MonoBehaviour
         Debug.LogError($"Передача {key} не найдена!");
         return 0f;
     }
+    public void ResetState()
+    {
+        horizontalInput = 0f;
+        verticalInput = 0f;
+        brakeInput = 0f;
+        currentSpeed = 0f;
+        key = "0";
+        foreach (Wheel wheel in wheels)
+        {
+            wheel.WheelCollider.motorTorque = 0f;
+            wheel.WheelCollider.brakeTorque = 0f;
+            wheel.WheelCollider.steerAngle = 0f;
+        }
+    }
+
     public float CurrentSpeed()
     {
         return currentSpeed;
