@@ -216,6 +216,7 @@ public class CarControllerAgent : MonoBehaviour
         transform.position = spawnPosition.position + new Vector3(Random.Range(-1f,1f),0,Random.Range(-1f,1f));
         transform.forward = spawnPosition.forward;
         trackCheckpoints.ResetCheckpoint(transform);
+        carSplineStats.ResetProgress();
         checksOver = 0;
         timer = 120f;
         spentTime = 0f;

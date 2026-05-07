@@ -4,6 +4,10 @@ public class CarSplineStats : MonoBehaviour
 {
     [SerializeField] private SplineCalculator splineCalculator;
     [SerializeField] private Transform carTransform;
+
+    private float _prevRawProgress = 0f;
+    private float _unwrappedProgress = 0f;
+
     void Start()
     {
         splineCalculator = FindObjectOfType<SplineCalculator>();
@@ -39,12 +43,37 @@ public class CarSplineStats : MonoBehaviour
     }
 
     /// <summary>
-    /// Процент прогресса вдоль сплайна
+    /// Сырой процент прогресса вдоль сплайна (0..1, с wraparound)
     /// </summary>
-    public float GetProgressAlongSpline()
+    public float GetRawProgress()
     {
         int index = GetClosestSplineIndex();
         return (float)index / (splineCalculator.splinePoints.Length - 1);
+    }
+
+    /// <summary>
+    /// Монотонный прогресс с учётом wraparound на замкнутом сплайне.
+    /// Корректно обрабатывает переход через границу 0/1.
+    /// </summary>
+    public float GetProgressAlongSpline()
+    {
+        float raw = GetRawProgress();
+        float delta = raw - _prevRawProgress;
+
+        if (delta > 0.5f)
+            delta -= 1f;
+        else if (delta < -0.5f)
+            delta += 1f;
+
+        _unwrappedProgress += delta;
+        _prevRawProgress = raw;
+        return _unwrappedProgress;
+    }
+
+    public void ResetProgress()
+    {
+        _prevRawProgress = GetRawProgress();
+        _unwrappedProgress = 0f;
     }
 
     /// <summary>
