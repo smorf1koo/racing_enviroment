@@ -38,8 +38,6 @@ public class CarControllerAgent : MonoBehaviour
     private float _wallContactStreakSec = 0f;
     private float _isMovingBackwardFlag = 0f;
     private float _lastForwardAmount = 0f;
-    private float _smoothedSteering = 0f;
-    private float _steeringSmoothFactor = 0.3f; // 0 = полностью сглажено, 1 = без сглаживания
     private float _maxWallRayDist = 20f;
     private Vector3 _rayOriginOffset = new Vector3(0f, 0.5f, 0f);
 
@@ -248,7 +246,6 @@ public class CarControllerAgent : MonoBehaviour
         _isTouchingWall = false;
         _wallContactStreakSec = 0f;
         _isMovingBackwardFlag = 0f;
-        _smoothedSteering = 0f;
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         carController.ResetState();
@@ -368,8 +365,7 @@ public class CarControllerAgent : MonoBehaviour
     public void ApplyAction(float forwardAmount, float turnAmount)
     {
         _lastForwardAmount = forwardAmount;
-        _smoothedSteering = Mathf.Lerp(_smoothedSteering, turnAmount, _steeringSmoothFactor);
-        carController.SetInput(forwardAmount, _smoothedSteering);
+        carController.SetInput(forwardAmount, turnAmount);
         // В external control режиме нужно гарантировать, что входы применятся до Physics.Simulate().
         if (_externalControl)
             carController.Tick();
