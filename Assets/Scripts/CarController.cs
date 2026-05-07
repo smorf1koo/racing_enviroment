@@ -122,13 +122,6 @@ public class CarController : MonoBehaviour
     private void HandleSteering()
     {
         float steeringAngle = horizontalInput * steeringCurve.Evaluate(currentSpeed);
-        float slipAngle = Vector3.Angle(transform.forward, rb.velocity - transform.forward);
-
-        if (slipAngle < 120)
-        {
-            steeringAngle += Vector3.SignedAngle(transform.forward, rb.velocity, Vector3.up);
-        }
-
         steeringAngle = Mathf.Clamp(steeringAngle, -30, 30);
 
         foreach (Wheel wheel in wheels)
