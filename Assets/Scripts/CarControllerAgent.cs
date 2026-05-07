@@ -37,6 +37,8 @@ public class CarControllerAgent : MonoBehaviour
     private bool _isTouchingWall = false;
     private float _wallContactStreakSec = 0f;
     private float _isMovingBackwardFlag = 0f;
+    private float _maxWallRayDist = 20f;
+    private Vector3 _rayOriginOffset = new Vector3(0f, 0.5f, 0f);
 
     public void SetExternalControl(bool value) => _externalControl = value;
 
@@ -267,14 +269,14 @@ public class CarControllerAgent : MonoBehaviour
     }
 
     /// <summary>
-    /// Возвращает вектор наблюдений для gRPC/TCP сервера (9 float).
+    /// Возвращает вектор наблюдений для gRPC/TCP сервера (11 float).
     /// Порядок: distance_to_spline, progress, angle_to_spline, curvature,
     /// distance_to_checkpoint, direction_dot, speed, wall_contact_streak_sec,
-    /// moving_backward_flag.
+    /// moving_backward_flag, wall_dist_left, wall_dist_right.
     /// </summary>
     public float[] GetObservationVector()
     {
-        var obs = new float[9];
+        var obs = new float[11];
         obs[0] = carSplineStats.GetDistanceToSpline();
         obs[1] = carSplineStats.GetProgressAlongSpline();
         obs[2] = carSplineStats.GetAngleToSplineDirection();
@@ -297,7 +299,22 @@ public class CarControllerAgent : MonoBehaviour
         obs[6] = rb.velocity.magnitude;
         obs[7] = _wallContactStreakSec;
         obs[8] = _isMovingBackwardFlag;
+        obs[9] = RaycastWallDistance(-transform.right);
+        obs[10] = RaycastWallDistance(transform.right);
         return obs;
+    }
+
+    private float RaycastWallDistance(Vector3 direction)
+    {
+        Vector3 origin = transform.position + _rayOriginOffset;
+        RaycastHit[] hits = Physics.RaycastAll(origin, direction, _maxWallRayDist);
+        float closest = _maxWallRayDist;
+        foreach (var hit in hits)
+        {
+            if (hit.collider.TryGetComponent<Wall>(out _) && hit.distance < closest)
+                closest = hit.distance;
+        }
+        return closest;
     }
 
     private void UpdateMovingBackwardFlag()
